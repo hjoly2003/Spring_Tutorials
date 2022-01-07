@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.proto</groupId>
+	<artifactId>eureka-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>eureka-service</name>
+	<description>Demo project for Spring Boot</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.6.1</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<java.version>11</java.version>
+		<spring-cloud.version>2021.0.0</spring-cloud.version>
+        <docker.image.prefix>proto</docker.image.prefix>
+	</properties>
+
+	<dependencies>
+		<!-- [N]:eureka-server - Includes the Eureka libraries. -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+
+		<!-- [+] -->
+		<!-- [N] - To get rid of the "Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider" problem when running the server and the client invoke it. -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.72.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+			<!-- [N]:docker - This plugin is used to create a docker image and publish the image to docker hub. This plugin will allow us to manage the Docker images and containers from our Maven pom.xml file. Note: Not yet compatible with the Mac M1. See README.md for a workaround. -->
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.13</version>
+				<configuration>
+					<!-- Sets the remote repository name. Here we use a predefined variable called docker.image.prefix (see line 22) and the project.artifactId (see line 7). -->
+					<repository>${docker.image.prefix}/${project.artifactId}</repository>
+	                <tag>${project.version}</tag>
+					<!-- Sets the JAR file location using <buildArgs>. This value is used in the Dockerfile. -->
+					<buildArgs>
+						<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE> <!-- 'finalName' is the name of the bundled project when it is finally built (without the file extension, for example: my-project-1.0.jar). It defaults to ${artifactId}-${version} (see finalName under http://maven.apache.org/pom.html#the-basebuild-element-set). -->
+					</buildArgs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default</id>
+						<phase>install</phase>
+						<goals>
+							<goal>build</goal>
+							<goal>push</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
+
+</project>

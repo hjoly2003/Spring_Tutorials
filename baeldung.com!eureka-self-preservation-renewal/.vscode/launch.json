@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-EurekaServerApplication<spring-cloud-eureka-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.baeldung.spring.cloud.eureka.server.EurekaServerApplication",
+            "projectName": "spring-cloud-eureka-server",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-EurekaClientApplication<spring-cloud-eureka-client>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.baeldung.spring.cloud.eureka.client.EurekaClientApplication",
+            "projectName": "spring-cloud-eureka-client",
+            "args": ""
+        }
+    ]
+}
