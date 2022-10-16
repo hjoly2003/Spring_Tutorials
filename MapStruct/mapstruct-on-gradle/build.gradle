@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+ext {
+    mapstructVersion = "1.5.2.Final"
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    testImplementation "org.testng:testng:6.10", "org.easytesting:fest-assert:1.4"
+
+    // [N]:mapstrut - MapStruct: to transform between Spring Data entity objects and the API model classes (See http://mapstruct.org).
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
+    // [N]:mapstrut - Required since MapStruct generates the implementation of the bean mappings at compile time by processing MapStruct annotations
+    compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs = [
+            '-Amapstruct.suppressGeneratorTimestamp=true'
+    ]
+}
+
+// [!]:mapstruct - For debugging and testing on vsc, the generated mapper implementation classes need to be added to the $HOME/bin/main classes hiearchy.
+tasks.register('copyMappers', Copy) {
+    dependsOn 'classes'
+    doFirst {
+        println "----- Copying mapper implementation from build dir: $buildDir to root project dir: $projectDir.";
+    }
+
+    from "$buildDir/classes/java/main" // layout.buildDirectory.dir("$buildDir/classes/java/main")
+    include "**/*MapperImpl.class"
+    into "$projectDir/bin/main"
+}
+
+test {
+    useTestNG()
+}

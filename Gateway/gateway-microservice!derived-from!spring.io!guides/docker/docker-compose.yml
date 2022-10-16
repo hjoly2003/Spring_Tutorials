@@ -1,0 +1,58 @@
+# [N]:docker - docker-compose.yml contains the service definitions used to launch the services. Docker Compose is a service orchestration tool that allows you to define services as a group and then to launch these together as a single unit. Docker Compose includes capabilities for also defining environment variables for each service.
+
+version: '3'
+
+# [N]:docker - Applies a label to each service launched. This becomes the DNS entry for the Docker instance when it starts, which is how other services access it.
+services:
+
+  # # [N]:eureka-server
+  # eurekaservice:
+  #   # [N]: The image URI is built from ${project.properties.docker.image.prefix}/${project.artifactId}:${project.version} as found in the related pom.xml
+  #   image: proto/eureka-service:0.0.1-SNAPSHOT
+  #   ports:
+  #     - "8070:8070"
+
+  #   # [?] - What for?
+  #   networks:
+  #     backend:
+  #       aliases:
+  #         - "eurekaservice"
+
+  # gatewayservice:
+    
+  #   # Docker Compose first tries to find the target image to be started in the local Docker repository. If it can’t find it, it checks the central Docker Hub (http://hub.docker.com).
+  #   # [N]: The image URI is built from ${project.properties.docker.image.prefix}/${project.artifactId}:${project.version} as found in the related pom.xml
+  #   image: proto/gateway-service:0.0.1-SNAPSHOT
+    
+  #   # [?] - Redundancy in defining ports btw docker-compose.yml and application.yml?
+  #   ports:
+  #     - "8072:8072"
+    
+  #   # Passes along environment variables to the starting Docker image. In this case, sets the SPRING_PROFILES_ACTIVE environment variable on the starting Docker image.
+  #   # [?] - Where are these properties used?
+  #   environment:  
+  #     SERVER_PORT: "8072"
+  #     EUREKASERVER_URI: "http://eurekaserver:8070/eureka/"
+  #     EUREKASERVER_PORT: "8070"
+  #   depends_on:
+  #     eurekaservice:
+  #       condition: service_started
+  #   # [?] - What for?
+  #   networks:
+  #     backend:
+  #       aliases:
+  #         - "gatewayservice"
+
+  greetingservice:
+    # Docker Compose first tries to find the target image to be started in the local Docker repository. If it can’t find it, it checks the central Docker Hub (http://hub.docker.com).
+    # [N]: The image URI is built from ${project.properties.docker.image.prefix}/${project.artifactId}:${project.version} as found in the related pom.xml
+    image: proto/greeting-service:0.0.1-SNAPSHOT
+
+    # [?] - Redundancy in defining ports btw docker-compose.yml and application.yml?
+    ports:
+      - "8081:8081"
+
+# # [?] - What for?
+# networks:
+#   backend:
+#     driver: bridge      

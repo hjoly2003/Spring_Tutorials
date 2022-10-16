@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: sample-db-vault
+  datasource:
+    # [N] Sets the database connection URI, but WITHOUT any credentials, assuming our application uses standard properties for authentication against the database (spring.datasource.username and spring.datasource.password).
+    url: jdbc:postgresql://postgres:5432/postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+  cloud:
+    vault:
+      config.lifecycle:
+        enabled: true
+        min-renewal: 10s
+        # [N] Enables lease renewal every 30 seconds.
+        expiry-threshold: 30s
+      kv.enabled: false
+      # [N] The application is going to be deployed in the default namespace, while Vault is running in the vault namespace. So, the address of Vault should include the namespace name
+      uri: http://vault.vault:8200
+      # [N] Uses the Kubernetes authentication method to access Vault.
+      authentication: KUBERNETES
+      # [N] Enables postgres database backend support.
+      postgresql:
+        enabled: true
+        role: default
+        backend: database
+      kubernetes:
+        role: internal-app
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint.health:
+#    show-details: always
+#    group:
+#      readiness:
+#        include: db
+#    probes:
+#      enabled: true

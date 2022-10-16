@@ -1,0 +1,9 @@
+spring.jpa.hibernate.ddl-auto: none
+
+spring:
+  datasource:
+    schema: classpath*:db/postgresql/schema.sql
+    data: classpath*:db/postgresql/data.sql
+
+logging.level.org.springframework: INFO
+

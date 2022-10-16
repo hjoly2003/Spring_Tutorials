@@ -1,0 +1,44 @@
+plugins {
+	// [N] spring boot gradle plugin. See https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle.
+	id 'org.springframework.boot' version '2.6.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java' 
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+// [!]
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+	set('springCloudVersion', "2021.0.0")
+}
+
+dependencies {
+	// [N]:actuator]:config]:client - To enable the client to refresh its properties from the Config Server.
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// [N]:config]:client - Dependencies required for contacting the configserver.
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// [N] pring Cloud BOM (Bill of Materials) definition
+dependencyManagement {
+	imports {
+		// [N] Required because some of the above dependencies require org.springframework.cloud 
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+test {
+	useJUnitPlatform()
+}

@@ -1,0 +1,150 @@
+:spring_version: current
+:spring_boot_version: 2.3.2.RELEASE
+:Controller: http://docs.spring.io/spring/docs/{spring_version}/javadoc-api/org/springframework/stereotype/Controller.html
+:DispatcherServlet: http://docs.spring.io/spring/docs/{spring_version}/javadoc-api/org/springframework/web/servlet/DispatcherServlet.html
+:SpringApplication: http://docs.spring.io/spring-boot/docs/{spring_boot_version}/api/org/springframework/boot/SpringApplication.html
+:ResponseBody: http://docs.spring.io/spring/docs/{spring_version}/javadoc-api/org/springframework/web/bind/annotation/ResponseBody.html
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-vault-config
+This guide walks you through the process of using https://cloud.spring.io/spring-cloud-vault/[Spring Cloud Vault] to build an application that retrieves its configuration properties from https://www.vaultproject.io[HashiCorp Vault].
+
+== What you'll build
+
+You'll start up Vault, store configuration properties inside Vault, build a Spring application and connect it with Vault.
+
+== What you'll need
+
+:java_version: 1.8
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/prereq_editor_jdk_buildtools.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/how_to_complete_this_guide.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/hide-show-gradle.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/hide-show-maven.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/hide-show-sts.adoc[]
+
+[[initial]]
+== Install and launch HashiCorp Vault
+
+With your project set up, you can install and launch HashiCorp Vault.
+
+
+If you are using a Mac with homebrew, this is as simple as:
+
+    $ brew install vault
+
+Alternatively, download Vault for your operating system from https://www.vaultproject.io/downloads.html:
+
+    $ https://releases.hashicorp.com/vault/1.2.1/vault_1.2.1_darwin_amd64.zip
+    $ unzip vault_1.2.1_darwin_amd64.zip
+
+For other systems with package management, such as Redhat, Ubuntu, Debian, CentOS, and Windows, see instructions at https://www.vaultproject.io/docs/install/index.html.
+
+After you install Vault, launch it in a console window. This command also starts up a server process.
+
+    $ vault server --dev --dev-root-token-id="00000000-0000-0000-0000-000000000000"
+
+You should see the following as one of the last output lines:
+
+....
+[INFO ] core: post-unseal setup complete
+....
+
+NOTE: The command above starts Vault in development mode using in-memory storage without transport encryption. This is fine
+for evaluating Vault locally. Make sure to use proper SSL certificates and a reliable storage backend for production use.
+Consult Vault's https://www.vaultproject.io/guides/production.html[Production Hardening guide] for further details.
+
+== Store configuration in Vault
+
+Vault is a secrets management system allowing you to store sensitive data which is encrypted at rest.
+It's ideal to store sensitive configuration details such as passwords, encryption keys, API keys.
+
+Launch another console window to store application configuration in Vault using the Vault command line.
+
+First, you need to set two environment variables to point the Vault CLI to the Vault endpoint and provide
+an authentication token.
+
+    $ export VAULT_TOKEN="00000000-0000-0000-0000-000000000000"
+    $ export VAULT_ADDR="http://127.0.0.1:8200"
+
+Now you can store a configuration key-value pairs inside Vault:
+
+    $ vault kv put secret/gs-vault-config example.username=demouser example.password=demopassword
+    $ vault kv put secret/gs-vault-config/cloud example.username=clouduser example.password=cloudpassword
+
+Now you have written two entries in Vault `secret/gs-vault-config` and `secret/gs-vault-config/cloud`.
+
+== Define your configuration class
+
+Create a simple configuration for your Spring application:
+
+`src/main/java/hello/MyConfiguration.java`
+[source,java,tabsize=2]
+----
+include::src/main/java/hello/MyConfiguration.java[]
+----
+
+== Configure your application
+
+Here you configure your application with `bootstrap.properties`. Spring Cloud Vault operates in the bootstrap context to initially
+obtain configuration properties so it can provide these to the auto-configuration and your application itself.
+
+`src/main/resources/bootstrap.properties`
+[source,properties]
+----
+include::src/main/resources/bootstrap.properties[]
+----
+
+== Create an Application class
+
+Here you create an Application class with all the components.
+
+`src/main/java/hello/Application.java`
+[source,java,tabsize=2]
+----
+include::src/main/java/hello/Application.java[]
+----
+
+Spring Cloud Vault uses `VaultOperations` to interact with Vault. Properties from Vault get mapped to
+`MyConfiguration` for type-safe access. `@EnableConfigurationProperties(MyConfiguration.class)` enables configuration property
+mapping and registers a `MyConfiguration` bean.
+
+`Application` includes a `main()` method that autowires an instance of `MyConfiguration`.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/build_an_executable_jar_mainhead.adoc[]
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/build_an_executable_jar_with_both.adoc[]
+
+As our `Application` implements `CommandLineRunner`, the `run` method is invoked automatically when boot
+starts. You should see something like this:
+....
+----------------------------------------
+Configuration properties
+        example.username is demouser
+        example.password is demopassword
+----------------------------------------
+....
+
+Now start your application with the `cloud` profile activated. You should see something like this:
+....
+----------------------------------------
+Configuration properties
+        example.username is clouduser
+        example.password is cloudpassword
+----------------------------------------
+....
+
+Configuration properties are bound according to the activated profiles. Spring Cloud Vault constructs a Vault context path
+from `spring.application.name` which is `gs-vault` and appends the profile name (`cloud`) so enabling the `cloud` profile
+will fetch additionally configuration properties from `secret/gs-vault-config/cloud`.
+
+== Summary
+
+Congratulations! You set up a Vault server and wrote a simple application that uses Spring Vault to read
+secrets into configuration properties and encrypt data with a strong cipher — all without the headache of
+implementing key management, a cipher mode, and padding.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/main/footer.adoc[]

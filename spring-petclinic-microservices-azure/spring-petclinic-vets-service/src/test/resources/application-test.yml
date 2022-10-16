@@ -1,0 +1,11 @@
+spring.jpa.hibernate.ddl-auto: none
+
+spring:
+  datasource:
+    schema: classpath*:db/postgresql/schema.sql
+    data: classpath*:db/postgresql/data.sql
+
+vets:
+  cache:
+    ttl: 10
+    heap-size: 10

@@ -1,0 +1,56 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.1")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+bootJar {
+    baseName = 'gs-gateway'
+    version =  '0.0.1-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+ext {
+    set('jettyVersion', "11.0.7")
+    set('springCloudVersion', "2020.0.3")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+dependencies {
+    // [N]:gtway 
+    implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+    
+    // [N]:circuit
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
+    
+    // [+]:wiremock
+    testImplementation "com.github.tomakehurst:wiremock-jre8:2.32.0"
+    implementation "org.eclipse.jetty:jetty-alpn-server:${jettyVersion}"
+    implementation "org.eclipse.jetty:jetty-alpn-java-server:${jettyVersion}"
+    
+    // [N] - Must be placed after the wiremock dependency
+    testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner"
+
+    // [N] - To get rid of the "Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider" problem when running the server and the client invoke it.
+    implementation "io.netty:netty-all:4.1.68.Final"
+}

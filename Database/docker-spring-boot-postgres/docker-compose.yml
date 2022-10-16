@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  app:
+    image: 'docker-spring-boot-postgres:0.0.1-SNAPSHOT'
+    build:
+      # Docker builds that image from the Dockerfile in the current directory
+      context: .
+    container_name: app
+    depends_on:
+      db:
+        # [N]:jpa - Depends on db.healthcheck setting (above).
+        condition: service_healthy
+    environment:
+      # Our application uses the db PostgreSQL container as the data source. The database name, the user name, and the password are all "compose-postgres".
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/compose-postgres
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+      # Hibernate will automatically create or update any database tables needed
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+          
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      # The user name and password are both compose-postgres
+      - POSTGRES_USER=compose-postgres
+      - POSTGRES_PASSWORD=compose-postgres
+    # [N] - To check is postgres is ready to accept connections (see: man pg_isready).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U compose-postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      

@@ -1,0 +1,24 @@
+spring.application.name: "greeting-service"
+
+server:
+  port: 8081
+
+# [N]:eureka-client 
+
+eureka:
+  client:
+    registerWithEureka: true
+
+    # [N]:eureka-client]:load-balance - Pulls down a local copy of the registry
+    fetchRegistry: true
+
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka
+
+  instance:
+    # [N]:eureka-client - Registers the IP address of the service rather than the server name. IP addresses are more appropriate for cloud-based microservices
+    preferIpAddress: true
+
+    # [baeldung]:eureka-client - The  interval in seconds of the client heartbeat (See https://www.baeldung.com/eureka-self-preservation-renewal#clients)
+    # [N]:eureka-server -  Used to get rid of the following warning in the eureka dashboard: "EMERGENCY! EUREKA MAY BE INCORRECTLY CLAIMING INSTANCES ARE UP WHEN THEY'RE NOT. RENEWALS ARE LESSER THAN THRESHOLD AND HENCE THE INSTANCES ARE NOT BEING EXPIRED JUST TO BE SAFE."
+    lease-renewal-interval-in-seconds: 30

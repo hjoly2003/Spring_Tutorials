@@ -1,0 +1,37 @@
+# [N]:docker - docker-compose.yml contains the service definitions used to launch the services. Docker Compose is a service orchestration tool that allows you to define services as a group and then to launch these together as a single unit. Docker Compose includes capabilities for also defining environment variables for each service.
+
+version: '3'
+
+# [N]:docker - Applies a label to each service launched. This becomes the DNS entry for the Docker instance when it starts, which is how other services access it.
+services:
+
+  # [N]:config]:server
+  config-server:
+    # [N]: The image URI is built from ${project.properties.docker.image.prefix}/${project.artifactId}:${project.version} as found in the related pom.xml
+    image: configuration-service:0.0.1-SNAPSHOT
+    ports:
+       - "8888:8888"
+    networks:
+      backend:
+        aliases:
+          - "configserver"
+
+  # [N]:config]:client
+  config-client:
+    # Docker Compose first tries to find the target image to be started in the local Docker repository. If it can’t find it, it checks the central Docker Hub (http://hub.docker.com).
+    # [N]: The image URI is built from ${project.properties.docker.image.prefix}/${project.artifactId}:${project.version} as found in the related pom.xml
+    image: gs-config-client:0.0.1-SNAPSHOT
+    environment:
+      # Sets up the active profile => uses ${spring.application.name}-${spring.profiles.active}.properties ,  the start of the environment variables
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      config-server:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

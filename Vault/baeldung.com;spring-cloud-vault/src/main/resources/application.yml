@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: fakebank
+  datasource:
+    url: jdbc:mysql://localhost:3306/fakebank?serverTimezone=GMT-3
+    hikari:
+      connection-test-query: select 1
+      idle-timeout: 5000
+      max-lifetime: 120000
+      maximum-pool-size: 5
+      minimum-idle: 5
+  cloud:
+    # [N]:config]:server]:vault
+    vault:
+      # [N]:config]:server]:vault - Points to Vault's API address.
+      uri: https://localhost:8200
+      connection-timeout: 5000
+      read-timeout: 15000
+      ssl:
+        # [N]:config]:server]:vault - Since our test environment uses HTTPS with a self-signed certificate, we also need to provide a keystore containing its public key. A JKS file is an encrypted security file used to store a set of cryptographic keys or certificates in the binary Java KeyStore (JKS) format.
+        trust-store: classpath:/vault.jks
+        trust-store-password: changeit
+      # [N]:config]:server]:vault - We use the Generic Secret backend to access unversioned secrets stored as Key-Value pairs in Vault.
+      generic:
+        enabled: true
+        # [N]:config]:server]:vault - The property application-name is optional in this case. If not specified, Spring will assume the value of the standard spring.application.name instead.
+        application-name: fakebank
+      #      kv:
+      #        enabled: false
+      #        backend: kv
+      #        application-name: fakebank
+      database:
+        enabled: true
+        role: fakebank-accounts-ro
+        backend: database
+        username-property: spring.datasource.username
+        password-property: spring.datasource.password
+  config:
+    import: vault://

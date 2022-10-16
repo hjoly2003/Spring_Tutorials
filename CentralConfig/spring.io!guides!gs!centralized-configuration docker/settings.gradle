@@ -1,0 +1,4 @@
+rootProject.name = 'gs-centralized-configuration-docker'
+
+include 'configuration-client'
+include 'configuration-service'

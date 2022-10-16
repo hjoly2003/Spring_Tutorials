@@ -1,0 +1,16 @@
+{
+    "type": "kv",
+    "description": "",
+    "config": {
+        "options": null,
+        "default_lease_ttl": "2592000s",
+        "max_lease_ttl": "5184000s",
+        "force_no_cache": false
+    },
+    "local": false,
+    "seal_wrap": false,
+    "external_entropy_access": false,
+    "options": {
+        "version": "2"
+    }
+}

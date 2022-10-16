@@ -1,0 +1,11 @@
+{
+    "policies": [
+        "mypolicy"
+    ],
+    "meta": {
+        "user": "hjoly"
+    },
+    "comment": "Default Lease TTL - The TTL (Time To Live) period of the token, provided as \"1h\", where hour is the largest suffix (set to 30 days). From https://www.vaultproject.io/api-docs/auth/token#create-token",
+    "ttl": "720h",
+    "renewable": true
+}

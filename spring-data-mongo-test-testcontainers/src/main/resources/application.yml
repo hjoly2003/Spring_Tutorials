@@ -1,0 +1,5 @@
+# [N]:nosql]:mongodb
+spring.data.mongodb:
+  host: localhost
+  port: 27017
+  database: product-db

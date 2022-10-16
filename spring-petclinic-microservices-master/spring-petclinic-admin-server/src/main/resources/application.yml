@@ -1,0 +1,18 @@
+spring:
+  application:
+    # [N]:eureka-client - The spring.application.name under which is registered this service in the Eureka Service Registry.
+    name: admin-server
+  config:
+    # [N]:config]:client - Different profiles defining the location of the Config service. See "Spring Boot Config Data Import" (https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#config-data-import)
+    # [N]:config]:client - The "configserver" prefix in the uri is for specifying the location of the Spring Boot Configuration if it is different from the default (http://localhost:8888).
+    # [N]:config]:client - The usage of the "optional" prefix in the uri is used if you don’t mind skipping a config file if it cannot be found. Note that from the Spring Boot release 2.4.0, a config file that can't be found will no longer fail silently.
+    # [TODO] Where the CONFIG_SERVER_URL is defined?
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/}
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+    import: configserver:http://config-server:8888

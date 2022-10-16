@@ -1,0 +1,120 @@
+# [N]:docker - docker-compose.yml contains the service definitions used to launch the services. Docker Compose is a service orchestration tool that allows you to define services as a group and then to launch these together as a single unit. Docker Compose includes capabilities for also defining environment variables for each service.
+
+# TODO - Upgrade to version 3.
+version: '2'
+
+# [N]:docker - Applies a label to each service launched. This becomes the DNS entry for the Docker instance when it starts, which is how other services access it.
+services:
+  # [N]:config]:server
+  config-server:
+    # Docker Compose first tries to find the target image to be started in the local Docker repository. If it can’t find it, it checks the central Docker Hub (http://hub.docker.com).
+    # [N]: The image URI is built from ${project.properties.docker.image.prefix}/${project.artifactId}:${project.version} as found in the related pom.xml
+    image: springcommunity/spring-petclinic-config-server
+    container_name: config-server
+    mem_limit: 512M
+    ports:
+     - 8888:8888
+
+  # [N]:eureka-server
+  discovery-server:
+    image: springcommunity/spring-petclinic-discovery-server
+    container_name: discovery-server
+    mem_limit: 512M
+    depends_on:
+      - config-server
+    # [N]:config]:server]:dockerize - Defines the endpoint of the Config service. Waits at most 1 minute for the Config service to start before launching the Discovery service.
+    # [N] The Spring Boot fat JarLauncher can be used to start the application without hard-coding the main application class (see "Spring Boot Layer Index" in https://spring.io/guides/topicals/spring-boot-docker/).
+    entrypoint: ["./dockerize","-wait=tcp://config-server:8888","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - 8761:8761
+
+  customers-service:
+    image: springcommunity/spring-petclinic-customers-service
+    container_name: customers-service
+    mem_limit: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    # [N]:dockerize - Waits at most 1 minute for the Discovery service to start before launching the Customer service.
+    # [N] The Spring Boot fat JarLauncher can be used to start the application without hard-coding the main application class (see "Spring Boot Layer Index" in https://spring.io/guides/topicals/spring-boot-docker/).
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+    - 8081:8081
+
+  visits-service:
+    image: springcommunity/spring-petclinic-visits-service
+    container_name: visits-service
+    mem_limit: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    # [N]:dockerize - Waits at most 1 minute for the Discovery service to start before launching the Visits service.
+    # [N] The Spring Boot fat JarLauncher can be used to start the application without hard-coding the main application class (see "Spring Boot Layer Index" in https://spring.io/guides/topicals/spring-boot-docker/).
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - 8082:8082
+
+  vets-service:
+    image: springcommunity/spring-petclinic-vets-service
+    container_name: vets-service
+    mem_limit: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    # [N]:dockerize - Waits at most 1 minute for the Discovery service to start before launching the Vets service.
+    # [N] The Spring Boot fat JarLauncher can be used to start the application without hard-coding the main application class (see "Spring Boot Layer Index" in https://spring.io/guides/topicals/spring-boot-docker/).
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - 8083:8083
+
+  api-gateway:
+    image: springcommunity/spring-petclinic-api-gateway
+    container_name: api-gateway
+    mem_limit: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    # [N]:dockerize - Waits at most 1 minute for the Discovery service to start before launching the Gateway service.
+    # [N] The Spring Boot fat JarLauncher can be used to start the application without hard-coding the main application class (see "Spring Boot Layer Index" in https://spring.io/guides/topicals/spring-boot-docker/).
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - 8080:8080
+
+  tracing-server:
+    image: openzipkin/zipkin
+    container_name: tracing-server
+    mem_limit: 512M
+    # Passes along environment variables to the starting Docker image. In this case, sets the JAVA_OPTS environment variable on the starting Docker image.
+    environment:
+    - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+    ports:
+     - 9411:9411
+
+  admin-server:
+    image: springcommunity/spring-petclinic-admin-server
+    container_name: admin-server
+    mem_limit: 512M
+    depends_on:
+     - config-server
+     - discovery-server
+    # [N]:dockerize - Waits at most 1 minute for the Discovery service to start before launching the Admin service.
+    # [N] The Spring Boot fat JarLauncher can be used to start the application without hard-coding the main application class (see "Spring Boot Layer Index" in https://spring.io/guides/topicals/spring-boot-docker/).
+    entrypoint: ["./dockerize","-wait=tcp://discovery-server:8761","-timeout=60s","--","java", "org.springframework.boot.loader.JarLauncher"]
+    ports:
+     - 9090:9090
+
+  ## Grafana / Prometheus
+
+  grafana-server:
+    build: ./docker/grafana
+    container_name: grafana-server
+    mem_limit: 256M
+    ports:
+    - 3000:3000
+
+  prometheus-server:
+    build: ./docker/prometheus
+    container_name: prometheus-server
+    mem_limit: 256M
+    ports:
+    - 9091:9090
