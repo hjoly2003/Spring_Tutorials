@@ -1,0 +1,1 @@
+spring-petclinic-microservices contains the generated classes as a result of the build of any of the other petclinic projects.
