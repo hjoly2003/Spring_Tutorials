@@ -2,35 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Accept a payment</title>
-    <meta name="description" content="A demo of a payment on Stripe" />
+    <title>Specify a feature request</title>
+    <meta name="description" content="A demo of a Spring Boot project with Stripe integration" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="checkout.css" />
-    <script src="https://js.stripe.com/v3/"></script>
-    <!-- [N]:stripePublicKey A Timeleaf variable declaration -->
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var stripePublicKey = /*[[${stripePublicKey}]]*/ null;
-        /*]]>*/
-    </script>
-    <script src="checkout.js" defer></script>
   </head>
   <body>
-    <!-- Display a payment form -->
-    <form id="payment-form">
+    <!-- Display a feature request form -->
+    <form id="feature-req-form" th:action="@{/}" th:object="${featureReqForm}" method="POST">
       <!-- [N] -->
-      <p><b>Welcome to the Transparent Software Developer</b></p>  
-      <p>If you hit the pay button, you will be billed 15 USD.</p>
-      <input type="text" id="email" placeholder="=Email address" required/>
+      <p><b>Welcome to the Transparent Stripe Integration!</b></p>  
 
-      <div id="payment-element">
-        <!--Stripe.js injects the Payment Element-->
-      </div>
-      <button id="submit">
-        <div class="spinner hidden" id="spinner"></div>
-        <span id="button-text">Pay now</span>
-      </button>
-      <div id="payment-message" class="hidden"></div>
+      <p>Email: <input type="text" th:field="*{email}" placeholder="Email address" required/></p>
+      <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red;"></p>
+      <p>Amount: <input type="text" th:field="*{amount}" placeholder="Amount" required/></p>
+      <p th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}" style="color: red;"></p>
+      <p>Feature Request: <input type="text" th:field="*{featureRequest}" placeholder="Feature Request" required/></p>
+      <p th:if="${#fields.hasErrors('featureRequest')}" th:errors="*{featureRequest}" style="color: red;"></p>
+
+      <p><input type="submit"/></p>
+      
     </form>
   </body>
 </html>

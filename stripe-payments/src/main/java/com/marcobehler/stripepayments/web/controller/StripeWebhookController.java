@@ -13,17 +13,20 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.PaymentMethod;
 import com.stripe.model.StripeObject;
 import com.stripe.net.ApiResource;
 import com.stripe.net.Webhook;
 
+/**
+ * [N]:webhooks - A controller for handling incoming Stripe webhooks events.
+ * In development, it uses a single endpoint (http://localhost:8080/stripe/events) for receiving the Stripe events. 
+ */
 @RestController
 public class StripeWebhookController {
 
     private Logger logger = LoggerFactory.getLogger(StripeWebhookController.class);
 
-    // [N]
+    // [N]:webhook
     @Value("${stripe.webhook.secret}")
     private String endpointSecret;
 
@@ -50,6 +53,7 @@ public class StripeWebhookController {
             // Only verify the event if you have an endpoint secret defined.
             // Otherwise use the basic event deserialized with GSON.
             try {
+                // [N]:webhook
                 event = Webhook.constructEvent(
                     payload, sigHeader, endpointSecret
                 );
@@ -68,6 +72,8 @@ public class StripeWebhookController {
             // Deserialization failed, probably due to an API version mismatch.
             // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
             // instructions on how to handle this case, or return an error here.
+            logger.info("⚠️  Webhook error while deserializing incoming {}.", event.getType()); // [N]
+            return "";
         }
         // Handle the event
         switch (event.getType()) {
@@ -78,7 +84,7 @@ public class StripeWebhookController {
                 // handlePaymentIntentSucceeded(paymentIntent);
                 break;
             case "payment_method.attached":
-                PaymentMethod paymentMethod = (PaymentMethod) stripeObject;
+                // PaymentMethod paymentMethod = (PaymentMethod) stripeObject;
                 // Then define and call a method to handle the successful attachment of a PaymentMethod.
                 // handlePaymentMethodAttached(paymentMethod);
                 break;

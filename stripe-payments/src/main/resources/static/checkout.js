@@ -1,11 +1,15 @@
 // This is a public sample test API key.
 // Don’t submit any personally identifiable information in requests made with this key.
 // Sign in to see your own test API key embedded in code samples.
-// [N]:stripePublicKey - The stripePublicKey is defined in the WebController.java
+// [N]:stripePublicKey]:th-variables - The stripePublicKey is defined in the WebController.java. Available through a Timeleaf variable declaration from checkout.html.
 const stripe = Stripe(stripePublicKey);
 
-// The items the customer wants to buy
-const items = [{ id: "xl-tshirt" }];
+var feature_request= {
+  // [N]:th-variables - Available through a Timeleaf variable declaration from intex.html. It will get sent inside the feature_request object to the WebController via "/create-payment-intent".
+  amount: amount,
+  email: email,
+  featureRequest: featureRequest
+}
 
 let elements;
 
@@ -21,7 +25,7 @@ async function initialize() {
   const response = await fetch("/create-payment-intent", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ items }),
+    body: JSON.stringify(feature_request),
   });
   const { clientSecret } = await response.json();
 
@@ -45,9 +49,15 @@ async function handleSubmit(e) {
   const { error } = await stripe.confirmPayment({
     elements,
     confirmParams: {
-      // [N] Make sure to change this to your payment completion page
-      return_url: "http://localhost:8080",
-      receipt_email: document.getElementById("email").value,
+      // [me] Make sure to change this to your payment completion page
+      return_url: "http://localhost:8080/checkout",
+      receipt_email: email,
+      // [me]:customizing-stripe-data-struture - Transmit the customer email to the Payment's billing details.  Doing so enables us to see, in the Stripe Dashboard, the user email associated to the payment. 
+      payment_method_data: {
+        billing_details: {
+          email: email
+        }
+      }
     },
   });
 
@@ -79,7 +89,9 @@ async function checkStatus() {
 
   switch (paymentIntent.status) {
     case "succeeded":
-      showMessage("Payment succeeded!");
+      // [me]
+      document.querySelector("#payment-outcome").classList.remove("hidden");
+      document.querySelector("#submit").classList.add("hidden");
       break;
     case "processing":
       showMessage("Your payment is processing.");

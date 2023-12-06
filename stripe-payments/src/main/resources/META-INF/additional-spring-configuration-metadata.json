@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "stripe.api.key",
+    "type": "java.lang.String",
+    "description": "Used to authenticate Stripe API requests."
+  },
+  {
+    "name": "stripe.public.key",
+    "type": "java.lang.String",
+    "description": "Publishable API key to identify your account with Stripe."
+  },
+  {
+    "name": "stripe.webhook.secret",
+    "type": "java.lang.String",
+    "description": "A secret associated with an endpoint. It's used to validate an incoming Stripe webhook event."
+  }
+]}
