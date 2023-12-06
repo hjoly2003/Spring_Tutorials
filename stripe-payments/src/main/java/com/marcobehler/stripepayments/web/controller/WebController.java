@@ -78,7 +78,7 @@ public class WebController {
     public ModelAndView getCompletion(
         @RequestParam(value="payment_intent", required=true) String paymentIntent,
         @RequestParam(value="payment_intent_client_secret", required=true) String paymentIntentClientSecret,
-    @RequestParam(value="redirect_status", required=true) String redirectStatus) throws StripeException {
+        @RequestParam(value="redirect_status", required=true) String redirectStatus) throws StripeException {
         
         ModelAndView modelAndView = new ModelAndView("checkout");
 
