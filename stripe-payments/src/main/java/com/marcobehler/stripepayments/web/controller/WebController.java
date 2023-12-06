@@ -68,33 +68,32 @@ public class WebController {
     /**
      * [me] This call is invoked by Stripe on successful submission of the <em>checkout form</em>.<p>
      * The url of this call got defined by the {@code confirmParams.return_url} parameter found in the {@code stripe.confirmPayment()} call within {@code checkout.js}.
-     * @param paymentIntent The ID of the <em>payment intent</em> that was created by Stripe.
+     * @param paymentIntentID The ID of the <em>payment intent</em> that was created by Stripe.
      * @param paymentIntentClientSecret
      * @param redirectStatus
+     * @param model
      * @return The Thymeleaf {@code checkout} template used for the <em>payment completion page</em>.
      * @throws StripeException
      */
     @GetMapping("/checkout")
-    public ModelAndView getCompletion(
-        @RequestParam(value="payment_intent", required=true) String paymentIntent,
+    public String getCompletion(
+        @RequestParam(value="payment_intent", required=true) String paymentIntentID,
         @RequestParam(value="payment_intent_client_secret", required=true) String paymentIntentClientSecret,
-        @RequestParam(value="redirect_status", required=true) String redirectStatus) throws StripeException {
+        @RequestParam(value="redirect_status", required=true) String redirectStatus, Model model) throws StripeException {
         
-        ModelAndView modelAndView = new ModelAndView("checkout");
-
         // [N]:stripePublicKey - we pass the stripePublicKey to the model of the presentation layer.
-        modelAndView.addObject("stripePublicKey", stripePublicKey);
+        model.addAttribute("stripePublicKey", stripePublicKey);
 
         // [me]:pmt-metadata - We fetch the pmt's metadata to make it available to the completion page.
-        PaymentIntent pmtIntent = PaymentIntent.retrieve(paymentIntent);
+        PaymentIntent pmtIntent = PaymentIntent.retrieve(paymentIntentID);
         Map<String, String> pmtIntentMap = pmtIntent.getMetadata();
-        modelAndView.addObject("amount", pmtIntentMap.get("amount"));
-        modelAndView.addObject("email", pmtIntentMap.get("email"));
+        model.addAttribute("amount", pmtIntentMap.get("amount"));
+        model.addAttribute("email", pmtIntentMap.get("email"));
 
-        modelAndView.addObject("payment_intent", paymentIntent);;
-        modelAndView.addObject("payment_intent_client_secret", paymentIntentClientSecret);
-        modelAndView.addObject("redirect_status", redirectStatus);;
+        model.addAttribute("payment_intent", paymentIntentID);
+        model.addAttribute("payment_intent_client_secret", paymentIntentClientSecret);
+        model.addAttribute("redirect_status", redirectStatus);
 
-        return modelAndView;
+        return "checkout";
     }
 }
