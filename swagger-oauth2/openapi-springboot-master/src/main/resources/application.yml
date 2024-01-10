@@ -1,0 +1,24 @@
+# swagger-ui custom path
+springdoc:
+    swagger-ui.disable-swagger-default-url: false
+
+    # Paths to include
+    pathsToMatch: /api/v1/books/**
+
+spring:
+    datasource:
+        url: jdbc:h2:mem:testdb
+        driverClassName: org.h2.Driver
+        username: sa
+        password: password
+    jpa.database-platform: org.hibernate.dialect.H2Dialect
+
+# [N]:oauth2
+security:
+  oauth2:
+    client:
+      client-id: codercuy-client
+      client-secret: strong-secret
+      scope:
+        - read
+        - write

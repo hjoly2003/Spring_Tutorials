@@ -14,8 +14,8 @@ public class StripePaymentsApplication {
 	@Value("${stripe.api.key}")
 	private String stripeApiKey;
 
-	// [N]
-	@PostConstruct
+  // [N]:stripeApiKey
+  @PostConstruct
 	public void init() {
 		Stripe.apiKey = stripeApiKey;
 	}
