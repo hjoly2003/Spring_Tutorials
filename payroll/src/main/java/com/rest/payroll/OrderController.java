@@ -69,46 +69,45 @@ public class OrderController {
     }
 
     /**
-     * Checks the {@code Order} status before allowing it to be cancelled. If it’s not a valid state, it returns an <a href="https://tools.ietf.org/html/rfc7807">RFC-7807 Problem</a>, a hypermedia-supporting error container. If the transition is indeed valid, it transitions the {@code Order} to {@code CANCELLED}.
+     * [me]
      * @param id
      * @return
      */
     @DeleteMapping("/orders/{id}/cancel")
     ResponseEntity<?> cancel(@PathVariable Long id) {
-
-        Order order = orderRepository.findById(id)
-            .orElseThrow(() -> new OrderNotFoundException(id));
-
-        try {
-            order.setStatus(Status.CANCELLED);
-            
-        } catch (IllegalStateException ex) {
-            return ResponseEntity
-                .status(HttpStatus.METHOD_NOT_ALLOWED)
-                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
-                .body(Problem.create()
-                    .withTitle("Method not allowed")
-                    .withDetail(ex.getMessage()));
-        }
-        return ResponseEntity.ok(assembler.toModel(orderRepository.save(order)));
+        return updateOrderStatus(id, Status.CANCELLED);
     }
-
+        
+    /**
+     * [me]
+     * @param id
+     * @return
+     */
     @PutMapping("/orders/{id}/complete")
     ResponseEntity<?> complete(@PathVariable Long id) {
+        return updateOrderStatus(id, Status.COMPLETED);
+    }
 
+    /**
+     * [me] Checks the {@code Order} status before allowing it to be changed. 
+     * @param id
+     * @param status
+     * @return
+     */
+    private ResponseEntity<?> updateOrderStatus(Long id, Status status) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new OrderNotFoundException(id));
 
-        try {
-            order.setStatus(Status.COMPLETED);
-        } catch (IllegalStateException ex) {
+        // try {
+            order.setStatus(status);
+        /* } catch (IllegalStateException ex) {
             return ResponseEntity
                 .status(HttpStatus.METHOD_NOT_ALLOWED)
                 .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
                 .body(Problem.create()
                     .withTitle("Method not allowed")
                     .withDetail(ex.getMessage()));
-        }
+        } */
         return ResponseEntity.ok(assembler.toModel(orderRepository.save(order)));
     }
 }

@@ -25,6 +25,11 @@ public class Order {
         this.status = status;
     }
 
+    /**
+     * [me] This method is used to update the status of an order.<p>
+     * A business rule is enforced here: an order can only be cancelled or completed if it is in progress.
+     * @param status
+     */
     void setStatus(Status status) {
 
         EnumSet<Status> permittedStatus = EnumSet.of(Status.CANCELLED, Status.COMPLETED);
