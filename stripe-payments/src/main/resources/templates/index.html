@@ -11,9 +11,9 @@
     <!-- Display a feature request form -->
     <form id="feature-req-form" th:action="@{/}" th:object="${featureReqForm}" method="POST">
       <!-- [N] -->
-      <p><b>Welcome to the Transparent Stripe Integration!</b></p>  
-
-      <p>Email: <input type="text" th:field="*{email}" placeholder="Email address" required/></p>
+      <p><b>Welcome to the Transparent Stripe Integration!</b></p>
+      
+            <p>Email: <input type="text" th:field="*{email}" placeholder="Email address" required/></p>
       <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red;"></p>
       <p>Amount: <input type="text" th:field="*{amount}" placeholder="Amount" required/></p>
       <p th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}" style="color: red;"></p>

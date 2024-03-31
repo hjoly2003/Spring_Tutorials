@@ -32,13 +32,14 @@ public class WebController {
     @GetMapping("/")
     public String home(Model model) {
         @SuppressWarnings("null")
-        FeatureReqForm emptyRequest = new FeatureReqForm(null,null,null);
+        FeatureReqForm emptyRequest = new FeatureReqForm(null,null,null/* ,"fr" / * [me]:i18 */);
         model.addAttribute("featureReqForm", emptyRequest);
         return "index";
     }
 
     /**
-     * [N]:mvc - Triggered when the client submit the <em>feature request</em> form.
+     * [N]:mvc - Triggered when the client submit the <em>feature request</em> form.<p/>
+     * Note that, on the client side, the <em>feature request</em> form is directly submitted to the Stripe sever via the {@code checkout.js} script and the Stripe javascript library.
      * @param featureReqForm [N]:mvc-validation - The {@code @Valid} annotation triggers the form validation
      * @param bindingResult [N]:mvc-validation - For Spring MVC validation. Note: this parameter must not be the last one in the method or else it won't work.
      * @param model Holds all the variables of the "index" page template.
@@ -60,13 +61,13 @@ public class WebController {
         model.addAttribute("amount", featureReqForm.amount());
         model.addAttribute("email", featureReqForm.email());
         model.addAttribute("featureRequest", featureReqForm.featureRequest()); 
-
+        
         return "checkout";
-    } 
-
+    }
+    
     /**
      * [me] This call is invoked by Stripe on successful submission of the <em>checkout form</em>.<p>
-     * The url of this call got defined by the {@code confirmParams.return_url} parameter found in the {@code stripe.confirmPayment()} call within {@code checkout.js}.
+     * The url of this call got defined by the {@code confirmParams.return_url} parameter found in the {@code stripe.confirmPayment()} call within {@code checkout.js} script.
      * @param paymentIntentID The ID of the <em>payment intent</em> that was created by Stripe.
      * @param paymentIntentClientSecret
      * @param redirectStatus

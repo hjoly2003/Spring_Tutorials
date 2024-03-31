@@ -40,4 +40,8 @@ There are no test: be it unit or integration whatsoever.
 * `[me]:pmt-metadata` - When Stripe makes a GET request to display the *payment completion page*, I used the payment's metadata to recover the template arguments of the *checkout page* (used for the completion page).
 
 ## How to run it
-
+From the project's root directory, type the following:
+```bash
+mvn spring-boot:run
+```
+When started, get to the following url: http://localhost:8080.

@@ -31,7 +31,7 @@ public class StripeWebhookController {
     private String endpointSecret;
 
     /**
-     * 
+     * This <em>POST</em> method is triggered by the Stripe server on different payment events.
      * @param payload
      * @param sigHeader [N] Stripe signature header
      * @return

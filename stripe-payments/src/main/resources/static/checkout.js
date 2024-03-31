@@ -5,7 +5,7 @@
 const stripe = Stripe(stripePublicKey);
 
 var feature_request= {
-  // [N]:th-variables - Available through a Timeleaf variable declaration from intex.html. It will get sent inside the feature_request object to the WebController via "/create-payment-intent".
+  // [N]:th-variables - Available through a Timeleaf variable declaration from intex.html. It will get sent inside the feature_request object to the PaymentController via "/create-payment-intent".
   amount: amount,
   email: email,
   featureRequest: featureRequest
